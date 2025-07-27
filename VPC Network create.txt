@@ -1,0 +1,24 @@
+gcloud compute networks create privatenet --subnet-mode=custom
+gcloud compute networks subnets create privatesubnet-1 --network=privatenet --region=us-east4 --range=172.16.0.0/24
+gcloud compute networks subnets create privatesubnet-2 --network=privatenet --region=asia-south1 --range=172.20.0.0/20
+
+gcloud compute networks list
+gcloud compute networks subnets list --sort-by=NETWORK
+
+Firewall rule:
+
+gcloud compute --project=qwiklabs-gcp-02-10eefec9a7b7 firewall-rules create managementnet-allow-icmp-ssh-rdp --direction=INGRESS --priority=1000 --network=default --action=ALLOW --rules=tcp:22,tcp:3389 --source-ranges=0.0.0.0/0
+
+gcloud compute firewall-rules create privatenet-allow-icmp-ssh-rdp --direction=INGRESS --priority=1000 --network=privatenet --action=ALLOW --rules=icmp,tcp:22,tcp:3389 --source-ranges=0.0.0.0/0
+
+gcloud compute firewall-rules create managementnet-allow-icmp-ssh-rdp --direction=INGRESS --priority=1000 --network=privatenet --action=ALLOW --rules=icmp,tcp:22,tcp:3389 --source-ranges=0.0.0.0/0
+
+create VM:
+
+gcloud compute instances create privatenet-vm-1 --zone=us-east4-c --machine-type=e2-micro --subnet=privatesubnet-1
+
+my-net-vm2 : 34.93.222.124
+managementnet-vm: 34.150.142.171
+privatenet-vm: 34.21.123.172
+
+gcloud compute --project=qwiklabs-gcp-02-10eefec9a7b7 firewall-rules create managementnet-allow-icmp-ssh-rdp --direction=INGRESS --priority=1000 --network=managementnet --action=ALLOW --rules=icmp,tcp:22,tcp:3389 --source-ranges=0.0.0.0/0
